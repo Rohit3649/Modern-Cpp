@@ -7,8 +7,25 @@ struct is_pointer {
 };
 
 template<typename T>
+struct is_pointer<T*> 
+{
+    static constexpr bool value = true;
+};
+
+template<typename T>
+struct strip_pointer{
+    using type = T;
+};
+
+template<typename T>
+struct strip_pointer<T*> {
+    using type = T;
+};
+
+template<typename T>
 void print1(T t) {
-    if constexpr(is_pointer<T>::value) {
+    using T_without_pointer = strip_pointer<T>::type;
+    if constexpr(is_pointer<T>::value && std::is_floating_point<T_without_pointer>::value) {
         std::cout << "pointer type : " << *t << std::endl;
     }
     else {
@@ -27,8 +44,11 @@ void print(A a, B b, C c){
 int main()
 {
     std::string hello = "Hello world";
-    print(1,2,3);
-    print(hello, 2, 2.3);
-    print(&hello, hello, 2.3);
+    //print(1,2,3);
+    //print(hello, 2, 2.3);
+    //print(&hello, hello, 2.3);
+    float a = 10;
+    double b = 2;
+    print(&hello, &a, &b);
     return 0;
 }
