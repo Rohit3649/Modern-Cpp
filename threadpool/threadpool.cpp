@@ -71,6 +71,21 @@ public:
         return ret;
     }
 
+    template<class F, class... Args>
+    auto executeTaskAsync(F&& f, Args&&... args) -> future<decltype(f(args...))> {
+        using return_type = decltype(f(args...));
+
+        unique_lock<mutex> ul{mtx};
+        taskQueue.emplace([f, args...](){
+            return f(args...); // Directly capture and call the function with arguments
+        });
+
+        ul.unlock();
+        cv.notify_one();
+
+        return async(launch::async, f, args...); // Use std::async to launch the task asynchronously
+    }
+
     ~Threadpool() {
         unique_lock<mutex> ul(mtx);
         stop = true;
