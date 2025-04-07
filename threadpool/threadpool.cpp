@@ -5,9 +5,17 @@
 #include <mutex>
 #include <condition_variable>
 #include <future>
+#include <concepts>
 using namespace std;
 
 using task = function<void()>;
+
+template<typename... Args>
+requires (std::is_arithmetic_v<Args>&& ...)
+auto sum(Args... args) {
+   cout << "Thread[" << this_thread::get_id() << "] ";
+   return (args + ...);
+}
 
 void fun() {
     cout << "fun Thread : " << this_thread::get_id() << endl;
@@ -107,6 +115,13 @@ int main()
         cout << "result : " << ret.get() << endl;
         this_thread::sleep_for(chrono::microseconds(200));
     }
+#endif
+#if 0
+    // The sum function is a templated function, and template functions cannot be passed as function pointers directly unless you explicitly specify the template parameters or use a lambda.
+    auto ret = pool.executeTask(sum<int, int>, 1, 2);
+    auto ret = pool.executeTask([](){
+         return sum(1,2,4);
+    });
 #endif
     return 0;
 }
