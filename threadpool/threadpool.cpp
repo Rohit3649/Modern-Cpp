@@ -118,8 +118,8 @@ int main()
 #endif
 #if 0
     // The sum function is a templated function, and template functions cannot be passed as function pointers directly unless you explicitly specify the template parameters or use a lambda.
-    auto ret = pool.executeTask(sum<int, int>, 1, 2);
-    auto ret = pool.executeTask([](){
+    auto ret = pool.executeGeneric(sum<int, int>, 1, 2);
+    auto ret = pool.executeGeneric([](){
          return sum(1,2,4);
     });
 #endif
